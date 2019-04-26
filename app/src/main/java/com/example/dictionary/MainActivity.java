@@ -9,32 +9,29 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String countires[] = {
-            "Nepal", "kathmandu",
-            "India", "New Delhi",
-            "China", "Beijing",
-            "Canada", "ottawa"
-    };
-
-
     private Map<String, String> dictionary;
-    ListView listView;
+    private ListView listView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = findViewById(R.id.listview);
 
+        listView = findViewById(R.id.listview);
         dictionary = new HashMap<>();
-        for (int i = 0; i < countires.length; i += 2) {
-            dictionary.put(countires[i], countires[i + 1]);
-        }
+
+        readFromFile();
         ArrayAdapter arrayAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_list_item_1,
                 new ArrayList<String>(dictionary.keySet())
@@ -49,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
                 String country=parent.getItemAtPosition(position).toString();
                 String capital=dictionary.get(country);
 //                Toast.makeText(getApplicationContext(), capital.toString(), Toast.LENGTH_SHORT).show();
-
                 Intent intent=new Intent(MainActivity.this,CapitalActivity.class);
                 intent.putExtra("country",capital);
                 startActivity(intent);
@@ -58,6 +54,24 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-}
+   public void readFromFile(){
+        FileInputStream fos=null;
+       try {
+           fos=openFileInput("words.txt");
+           InputStreamReader isr=new InputStreamReader(fos);
+           BufferedReader br=new BufferedReader(isr);
+           String line="";
+           while ((line=br.readLine())!=null) {
+           String[] parts=line.split("->");
+           dictionary.put(parts[0],parts[1]);
+           }
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+
+
+   }
+   }
+
 
 
